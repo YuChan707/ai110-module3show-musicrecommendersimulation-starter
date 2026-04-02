@@ -1,6 +1,6 @@
 🔵 Use Copilot Chat to research and summarize how major streaming platforms (like Spotify or YouTube) predict what users will love next. Structure your prompt to specifically ask for the difference between collaborative filtering (using other users' behavior) and content-based filtering (using song attributes).
 
-Gemini
+🤖 Gemini
 -user behavior
     + How it works: It identifies patterns between users. If User A and User B both love the same five songs, and User B also likes a sixth song that User A hasn't heard yet, the system predicts User A will love that sixth song too.
     + The Logic: "People who liked what you liked also liked this".
@@ -13,7 +13,7 @@ Gemini
     + Strengths: It is highly effective at recommending niche content or new releases (solving the Cold Start problem) because it only needs the file's attributes to make a match.
     + Weaknesses: It can lead to a "Filter Bubble." Since it only recommends things similar to what you’ve already consumed, it rarely introduces you to completely new styles or genres.
 
-Copilot
+🤖 Copilot
 1. **Collaborative Filtering** — how it uses other users' behavior (listening history, likes, skips, playlists) to make predictions. Include matrix factorization, user-user vs item-item CF, and how Spotify's "Discover Weekly" uses it.
 
 2. **Content-Based Filtering** — how it uses song attributes (tempo, key, energy, danceability, acousticness, loudness, genre tags) to match songs to user taste profiles. Include how audio analysis (e.g., Echo Nest / Spotify audio features) powers this.
@@ -121,7 +121,7 @@ Share	-  bool	(Strong positive signal)
 
 🔵 Examine the data/songs.csv file to see the available attributes for your simulator, such as genre, mood, energy, and tempo_bpm
 
-Clauden 
+🤖 Clauden 
 
 songs.csv — Attribute Overview
 Schema (10 columns)
@@ -173,7 +173,7 @@ The starter user_prefs in main.py:19 uses {"genre": "pop", "mood": "happy", "ene
 
 
 
-Copilot:
+🤖 Copilot:
 
 ✅ Data inspection: available features in songs.csv
 songs.csv has these columns:
