@@ -1,0 +1,45 @@
+Algorithm Recipe
+
+Core Concept
+Every song gets a total score from 0.0 to 1.0. The score is a weighted sum of individual match signals. Higher score = better recommendation.
+
+total_score = (genre_score × 0.30)
+            + (mood_score  × 0.25)
+            + (energy_score × 0.25)
+            + (acoustic_score × 0.20)
+
+
+Rule 1 — Genre Match (weight: 30%)
+
+IF song.genre == user.favorite_genre → genre_score = 1.0
+ELSE                                 → genre_score = 0.0
+Binary. Genre is the strongest preference signal.
+Example: user likes "pop" → Song 1 (pop) scores 1.0, Song 3 (rock) scores 0.0.
+
+
+Rule 2 — Mood Match (weight: 25%)
+
+IF song.mood == user.favorite_mood → mood_score = 1.0
+ELSE                               → mood_score = 0.0
+Binary. Mood is the second strongest categorical signal.
+Example: user wants "happy" → Song 1 and Song 10 score 1.0, Song 8 (moody) scores 0.0.
+
+
+Rule 3 — Energy Proximity (weight: 25%)
+
+energy_diff  = abs(song.energy - user.target_energy)
+energy_score = 1.0 - energy_diff
+Continuous. Penalizes distance from the user's target intensity.
+Example: user target = 0.8, Song 1 energy = 0.82 → 1.0 - 0.02 = 0.98. Song 6 energy = 0.28 → 1.0 - 0.52 = 0.48.
+
+Rule 4 — Acoustic Preference (weight: 20%)
+
+IF user.likes_acoustic == True:
+    acoustic_score = song.acousticness        # reward high acousticness
+
+IF user.likes_acoustic == False:
+    acoustic_score = 1.0 - song.acousticness  # reward low acousticness (electronic)
+Continuous. Rewards songs that align with the user's acoustic/electronic preference.
+Example: user likes_acoustic=False, Song 5 acousticness = 0.05 → score = 0.95. Song 7 acousticness = 0.89 → score = 0.11
+
+
