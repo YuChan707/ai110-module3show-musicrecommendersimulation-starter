@@ -1,4 +1,4 @@
-Use Copilot Chat to research and summarize how major streaming platforms (like Spotify or YouTube) predict what users will love next. Structure your prompt to specifically ask for the difference between collaborative filtering (using other users' behavior) and content-based filtering (using song attributes).
+🔵 Use Copilot Chat to research and summarize how major streaming platforms (like Spotify or YouTube) predict what users will love next. Structure your prompt to specifically ask for the difference between collaborative filtering (using other users' behavior) and content-based filtering (using song attributes).
 
 Gemini
 -user behavior
@@ -85,3 +85,34 @@ YouTube's Two-Tower Network: Candidate generation tower + ranking tower, trained
 Spotify's song2vec: Treats listening sessions like sentences — songs appearing together frequently get embedded close in vector space.
 CNNs on raw spectrograms: Learn deep audio representations far richer than the 12 Echo Nest features — solves item cold start for brand-new tracks.
 Transformers: Model listening as a sequence — capturing that a user shifts from high-energy to mellow after 45 minutes.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+🔵 Identify the main data types involved in these systems, such as likes, skips, playlists, tempo, or mood
+
+Songs.csv
+Song ID -  int	(unique identifier)
+Title - str	
+Artist - str	
+Genre - str	("pop", "jazz", "hip-hop")
+Mood - str		("happy", "melancholic", "energetic")
+Energy - float (Perceptual intensity of the track)
+Tempo - float (BPM)	Song.tempo_bpm	Speed — e.g. 128.0 BPM
+Valence - float (Musical positivity/happiness)
+Danceability - float (Rhythm stability, beat strength)
+Acousticness - float (Acoustic vs. electronic)
+
+User Preference Data
+Favorite Genre	-  str	(UserProfile.favorite_genre which represent the  genre match signal)
+Favorite Mood	-  str	(UserProfile.favorite_mood	which represent the mood match signal)
+Target Energy	-  float	(UserProfile.target_energy	which represent the Preferred intensity level)
+Likes Acoustic	-  bool	 (UserProfile.likes_acoustic	which represent the preference flag)
+
+Behavioral Signals
+
+Play / Listen	int (count) or bool	Positive weight in user profile
+Skip	bool or timestamp	Negative weight — "user rejected this"
+Like / Save	bool	Strong positive signal
+Playlist Add	bool / List[song_id]	Strong co-occurrence signal for CF
+Repeat Listen	int (count)	High engagement signal
+Listen Duration	float (seconds/ratio)	% of song heard — partial plays matter
+Share	bool	Strong positive signal
