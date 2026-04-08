@@ -33,14 +33,6 @@ A Recommender class also exists, along with two functions: load_songs and recomm
 The runner is ready — src/main.py
 It sets a starter user profile (pop / happy / energy 0.8), calls the recommender, and prints the top 5 results with explanations.
 
-What Hasn't Been Built Yet
-Every core function is still a placeholder:
-
-Function	                          |  Status
-load_songs	                        |  Returns empty list — CSV not actually read
-recommend_songs	                    |  Returns empty list — no scoring done
-Recommender.recommend	Just returns the first k songs — no logic
-Recommender.explain_recommendation	|  Returns "Explanation placeholder"
 
 The skeleton is complete — the data, the data structures, and the wiring between files are all in place — but the actual intelligence (scoring songs, ranking them, explaining why) still needs to be implemented inside the TODO sections of src/recommender.py.
 
