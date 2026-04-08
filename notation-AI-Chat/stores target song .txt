@@ -1,0 +1,63 @@
+Evaluating Your User Profile Design
+1. Is it expressive enough to tell "intense rock" vs "chill lo-fi" apart?
+Partially. Here's why — mapped against your actual song catalog:
+
+Feature	Intense Rock (Storm Runner)	Chill Lo-fi (Library Rain)
+genre	rock	lofi
+mood	intense	chill
+energy	0.91	0.35
+tempo_bpm	152	72
+acousticness	0.10	0.86
+valence	0.48	0.60
+Your profile catches the genre, mood, energy, and tempo differences. But acousticness is the clearest separator between these two styles and your profile doesn't include it. Without it, an electronic ambient track could score the same as a lo-fi acoustic one.
+
+2. Too narrow or too broad?
+Too narrow in one way, too rigid in another:
+
+target_tempo_bpm: 140 as a single fixed number is very strict. A user who likes 140 BPM rock also likely enjoys 130 or 150 — a range is more realistic.
+favorite_genre: "rock" scores 0.0 for "indie pop" and "synthwave" even when those might feel similar. Binary genre matching creates hard walls between adjacent styles.
+3. What additional features would improve accuracy?
+Add this	Why
+target_acousticness	Best single separator between electronic and organic styles
+target_valence	Captures happy vs dark/moody — independent of energy
+tempo_range (min/max)	More realistic than a single BPM target
+target_danceability	Separates workout/club from ambient/study
+4. Potential biases and limitations
+Binary genre/mood matching punishes songs that are stylistically close but labelled differently (e.g. "indie pop" when the user said "pop")
+Single tempo target will reject songs that feel right but sit 10 BPM away
+No feature weights — the system can't know that this user cares deeply about energy but doesn't mind tempo variation
+No negative preferences — no way to say "never recommend jazz" without it just scoring 0.0 on genre
+5. Improved Profile
+
+user_prefs = {
+    # Categorical preferences
+    "favorite_genre": "rock",
+    "favorite_mood": "intense",
+
+    # Numeric targets — all features now represented
+    "target_energy":        0.85,
+    "target_valence":       0.50,
+    "target_danceability":  0.65,
+    "target_acousticness":  0.10,
+
+    # Tempo as a range instead of a fixed point
+    "tempo_min": 120,
+    "tempo_max": 160,
+
+    # Per-feature weights — user expresses what matters most
+    "weights": {
+        "genre":        0.25,
+        "mood":         0.20,
+        "energy":       0.25,
+        "acousticness": 0.15,
+        "valence":      0.10,
+        "tempo":        0.05
+    }
+}
+What changed and why:
+
+target_acousticness: 0.10 — locks in the "electric, not acoustic" character of rock
+target_valence: 0.50 — captures the darker edge of intense rock vs happy pop
+tempo_min/max — a window instead of a bullseye; songs at 135 or 148 BPM both feel right
+weights — energy and genre matter most for this profile; tempo is a soft preference, not a hard filter
+This profile would now correctly rank Storm Runner (rock, intense, energy 0.91, acousticness 0.10) far above Library Rain (lofi, chill, energy 0.35, acousticness 0.86), even if both happened to share the same tempo.
