@@ -106,6 +106,51 @@ likes_acoustic	    |  song.acousticness  |	Direction — continuous
 title, artist, id, tempo_bpm, valence, and danceability are stored on the Song but not used in scoring yet/ They're available for display and future expansion.
 
 ---
+
+# Algorithm Recipe
+**How Songs Are Evaluated**
+- Every song in the catalog is scored against the user's taste profile
+- Each song receives a single number between 0.0 and 1.0
+- The score combines four independent feature assessments using fixed weights
+
+**Feature scoring breakdown:**
+
+*Genre match (30% of total score)*
+- Checks whether the song's genre exactly matches the user's preferred genre
+- Full match → 0.30 points; no match → 0 points
+- Carries the highest weight because genre is the strongest predictor of taste
+
+*Mood match (25% of total score)*
+- Checks whether the song's mood label exactly matches the user's preferred mood
+- Full match → 0.25 points; no match → 0 points
+- Weighted second because mood captures the emotional context of a listening session
+
+*Energy proximity (25% of total score)*
+- Energy is a continuous value from 0.0 to 1.0
+- Scored by measuring how close the song's energy is to the user's target
+- Perfect match → 0.25 points; opposite extreme → 0 points
+- Uses a smooth gradient — near-matches are still rewarded
+
+*Acoustic preference (20% of total score)*
+- Reflects whether the user prefers acoustic or electronic-sounding music
+- If the user likes acoustic → higher acousticness songs are rewarded
+- If the user prefers non-acoustic → the score is inverted to favor electronic songs
+- Contributes up to 0.20 points
+
+**How Recommendations Are Selected**
+After every song in the catalog has been scored, the system ranks all songs in descending order — highest score first. The top K results from this ranked list are returned as recommendations, where K is a number specified at the time of the request (defaulting to five). Each recommendation is accompanied by a plain-language explanation identifying which features drove the match, such as a shared genre or a close energy level.
+
+**Limitations and Potential Biases**
+The current scoring model has several known limitations that users and developers should be aware of.
+
+- Genre dominance — a wrong genre label can push a song down even if mood and energy are a strong match
+- Binary matching — "indie pop" and "pop" are treated as completely different; "chill" and "relaxed" are not recognized as similar
+- Static profile — the system does not learn from listening history or adjust to changing moods over time
+- Unused features — tempo, valence, and danceability are stored on each song but not factored into scoring
+- Small catalog — with only 20 songs, even the top result may be a weak match; differentiation between results is limited
+
+---
+
 ## Getting Started
 
 ### Setup
