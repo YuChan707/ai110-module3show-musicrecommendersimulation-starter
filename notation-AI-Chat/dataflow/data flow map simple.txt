@@ -1,0 +1,25 @@
+flowchart TD
+    A[("songs.csv")] -->|"load_songs()"| B["List of 20 song dicts\nid · title · artist · genre · mood\nenergy · tempo_bpm · valence\ndanceability · acousticness"]
+    C[/"user_prefs\ngenre · mood · energy · likes_acoustic"/] --> D
+
+    B --> D["recommend_songs(user_prefs, songs, k=5)"]
+
+    D --> E["scored = []"]
+    E --> F{"More songs\nin the list?"}
+
+    F -->|"Yes — take next song"| G["score_song(song)"]
+
+    G --> H["Rule 1: genre match?\n1.0 or 0.0  ×  0.30"]
+    G --> I["Rule 2: mood match?\n1.0 or 0.0  ×  0.25"]
+    G --> J["Rule 3: 1 - abs(song.energy - target)\n×  0.25"]
+    G --> K["Rule 4: acousticness pref\nraw or 1-raw  ×  0.20"]
+
+    H & I & J & K --> L["total = Σ weighted scores\nrange: 0.0 – 1.0"]
+
+    L --> M["build explanation string\nfrom matched rules"]
+    M --> N["append  (song, total, explanation)\nto scored list"]
+    N --> F
+
+    F -->|"No — all 20 done"| O["sorted(scored, key=score, reverse=True)"]
+    O --> P["ranked[:k]  →  top 5 tuples"]
+    P --> Q[/"Print each:\ntitle  ·  Score: 0.93\nBecause: matches genre (pop) ..."/]

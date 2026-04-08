@@ -1,0 +1,60 @@
+╔══════════════════════════════════════════════════════════════╗
+║                    STAGE 1 — INPUT                           ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  A) songs.csv  ──► load_songs(csv_path)                      ║
+║                    └─ returns List[Dict]  (20 songs)         ║
+║                    └─ each dict has 10 keys:                 ║
+║                       id, title, artist, genre, mood,        ║
+║                       energy, tempo_bpm, valence,            ║
+║                       danceability, acousticness             ║
+║                                                              ║
+║  B) user_prefs = {                                           ║
+║       "genre":  "pop",                                       ║
+║       "mood":   "happy",                                     ║
+║       "energy":  0.8,                                        ║
+║       "likes_acoustic": False   ← implicit default           ║
+║     }                                                        ║
+╚══════════════════════════════════════════════════════════════╝
+                            │
+                            │ both passed into ↓
+                            ▼
+╔══════════════════════════════════════════════════════════════╗
+║                    STAGE 2 — THE LOOP                        ║
+║             recommend_songs(user_prefs, songs, k)            ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  for each song in songs:   ◄─── visits all 20 rows          ║
+║  │                                                           ║
+║  └─► score_song(song)   ← the scoring engine                 ║
+║        │                                                     ║
+║        ├─ Rule 1: genre match?  → 1.0 or 0.0  × 0.30        ║
+║        ├─ Rule 2: mood match?   → 1.0 or 0.0  × 0.25        ║
+║        ├─ Rule 3: energy diff   → (1 - |Δ|)   × 0.25        ║
+║        └─ Rule 4: acousticness  → raw or 1-raw × 0.20        ║
+║                                                              ║
+║        total = sum of 4 weighted scores  (0.0 – 1.0)        ║
+║        explanation = string built from matched rules         ║
+║                                                              ║
+║        yields: (song_dict, score_float, explanation_str)     ║
+║                                                              ║
+║  scored = [(song, score, explanation), ...] ← 20 tuples      ║
+║                                                              ║
+║  ranked = sorted(scored, key=score, reverse=True)            ║
+║                         ↑                                    ║
+║                  highest score first                         ║
+╚══════════════════════════════════════════════════════════════╝
+                            │
+                            │ sliced to top K
+                            ▼
+╔══════════════════════════════════════════════════════════════╗
+║                    STAGE 3 — OUTPUT                          ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  ranked[:k]  →  List of (song, score, explanation)           ║
+║                                                              ║
+║  main.py prints:                                             ║
+║    "Sunrise City      - Score: 0.93"                         ║
+║    "Because: matches your favorite genre (pop) and ..."      ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
