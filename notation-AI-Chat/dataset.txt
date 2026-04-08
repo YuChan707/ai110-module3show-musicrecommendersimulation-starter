@@ -1,0 +1,25 @@
+PROMPT - QUESTION: 
+
+I am working on a music recommender system using a dataset stored in a CSV file (songs.csv). The dataset includes columns such as:
+title, artist, genre, mood, energy, tempo_bpm.
+
+The current dataset contains 10 songs. Please:
+
+Review the structure and format of the dataset to ensure consistency
+Generate 5–10 new songs in valid CSV format
+Use the same headers and column order as the existing file
+Ensure all values follow the correct data types:
+genre → string
+mood → string
+energy → float between 0.0 and 1.0
+tempo_bpm → integer (reasonable BPM range, e.g., 60–180)
+Make sure the new songs introduce diverse genres and moods NOT already present in the original 10 songs
+For example, if existing songs are mostly pop and happy, include genres like jazz, classical, electronic, lo-fi, or indie
+Include moods such as melancholic, aggressive, peaceful, nostalgic, or experimental
+Ensure the energy values are realistic and aligned with the mood
+High energy (0.7–1.0) → energetic, aggressive
+Medium energy (0.4–0.7) → balanced, relaxed
+Low energy (0.0–0.4) → calm, sad, ambient
+Output ONLY the new rows in clean CSV format, without explanations
+
+
