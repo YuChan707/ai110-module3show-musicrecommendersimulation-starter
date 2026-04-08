@@ -90,60 +90,56 @@ def load_songs(csv_path: str) -> List[Dict]:
                 "genre":        row["genre"],
                 "mood":         row["mood"],
                 "energy":       float(row["energy"]),
-                "tempo_bpm":    float(row["tempo_bpm"]),
+                "tempo_bpm":    int(row["tempo_bpm"]),
                 "valence":      float(row["valence"]),
                 "danceability": float(row["danceability"]),
                 "acousticness": float(row["acousticness"]),
             })
     return songs
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+# Scoring weights — adjust these values to tune the algorithm
+GENRE_POINTS = 2.0   # awarded for an exact genre match
+MOOD_POINTS  = 1.0   # awarded for an exact mood match
+ENERGY_MAX   = 1.0   # maximum points awarded for energy proximity
+
+
+def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, List[str]]:
     """
-    Functional implementation of the recommendation logic.
-    Required by src/main.py
+    Scores a single song against the user's preferences.
+
+    Returns:
+        (total_score, reasons) where reasons is a list of strings
+        explaining each contribution to the score.
     """
-    def score_song(song: Dict) -> Tuple[float, str]:
-        # --- Rule 1: Genre match (30%) ---
-        genre_score = 1.0 if song["genre"] == user_prefs.get("genre") else 0.0
+    total   = 0.0
+    reasons = []
 
-        # --- Rule 2: Mood match (25%) ---
-        mood_score = 1.0 if song["mood"] == user_prefs.get("mood") else 0.0
+    # --- Rule 1: Genre match ---
+    if song["genre"] == user_prefs.get("genre"):
+        total += GENRE_POINTS
+        reasons.append(f"genre match (+{GENRE_POINTS})")
 
-        # --- Rule 3: Energy proximity (25%) ---
-        target_energy = user_prefs.get("energy", 0.5)
-        energy_diff = abs(song["energy"] - target_energy)
-        energy_score = 1.0 - energy_diff
+    # --- Rule 2: Mood match ---
+    if song["mood"] == user_prefs.get("mood"):
+        total += MOOD_POINTS
+        reasons.append(f"mood match (+{MOOD_POINTS})")
 
-        # --- Rule 4: Acoustic preference (20%) ---
-        likes_acoustic = user_prefs.get("likes_acoustic", False)
-        acoustic_score = song["acousticness"] if likes_acoustic else 1.0 - song["acousticness"]
+    # --- Rule 3: Energy proximity ---
+    # The closer the song's energy is to the user's target,
+    # the higher the points — smooth gradient, no cliff edges.
+    target_energy = user_prefs.get("energy", 0.5)
+    energy_diff   = abs(song["energy"] - target_energy)
+    energy_points = round(ENERGY_MAX * (1.0 - energy_diff), 2)
+    total        += energy_points
+    reasons.append(f"energy close to target (+{energy_points})")
 
-        # --- Weighted total ---
-        total = (
-            genre_score   * 0.30 +
-            mood_score    * 0.25 +
-            energy_score  * 0.25 +
-            acoustic_score * 0.20
-        )
+    return round(total, 2), reasons
 
-        # --- Build explanation ---
-        reasons = []
-        if genre_score == 1.0:
-            reasons.append(f"matches your favorite genre ({song['genre']})")
-        if mood_score == 1.0:
-            reasons.append(f"matches your preferred mood ({song['mood']})")
-        if energy_diff < 0.15:
-            reasons.append("energy level is close to your target")
-        if acoustic_score > 0.7:
-            reasons.append("fits your acoustic preference")
 
-        if reasons:
-            explanation = "Recommended because it " + " and ".join(reasons)
-        else:
-            explanation = "Closest available match to your preferences"
-
-        return total, explanation
-
-    scored = [(song, *score_song(song)) for song in songs]
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, List[str]]]:
+    """
+    Scores every song, ranks by score descending, returns top k.
+    """
+    scored = [(song, *score_song(song, user_prefs)) for song in songs]
     ranked = sorted(scored, key=lambda x: x[1], reverse=True)
     return ranked[:k]

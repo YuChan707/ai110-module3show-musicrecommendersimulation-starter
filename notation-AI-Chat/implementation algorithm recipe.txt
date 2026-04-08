@@ -1,0 +1,29 @@
+How the scoring works
+
+Constants at the top (recommender.py:100-103)
+Three named constants control the weights. Changing GENRE_POINTS = 2.0 to 3.0 is all it takes to retune the algorithm — no hunting through logic.
+
+Rule 1 — Genre match (recommender.py:117-120)
+Binary check. Exact match → +2.0. No match → nothing added. The reason string records the exact contribution so the caller always knows why.
+
+Rule 2 — Mood match (recommender.py:122-125)
+Same binary pattern. Exact match → +1.0.
+
+Rule 3 — Energy proximity (recommender.py:127-134)
+Formula: ENERGY_MAX × (1.0 - |song_energy - target_energy|)
+
+Perfect match (diff = 0.0) → +1.0
+Half-way off (diff = 0.5) → +0.5
+Opposite extreme (diff = 1.0) → +0.0
+This is a linear decay — every bit closer still earns something. The result is rounded to 2 decimal places before appending to reasons so the output reads cleanly (e.g. +0.96 not +0.9599999).
+
+Maximum possible score: 4.0 (2.0 + 1.0 + 1.0)
+
+Example output for "Sunrise City" against {genre: pop, mood: happy, energy: 0.8}:
+
+
+("Sunrise City", 3.98, [
+  "genre match (+2.0)",
+  "mood match (+1.0)",
+  "energy close to target (+0.98)"
+])
