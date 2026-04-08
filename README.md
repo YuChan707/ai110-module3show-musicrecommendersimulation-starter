@@ -73,35 +73,38 @@ You can include a simple diagram or bullet list if helpful.
 
 ## List the specific features
 # Song Features
-Field         |	  Type  |    Example
-id	          |   int	  |       1
-title	        |   str	  |  "Sunrise City"
-artist	      |   str	  |  "Neon Echo"
-genre	        |   str	  |     "pop"
-mood	        |   str	  |     "happy"
-energy	      |  float	|      0.82
-tempo_bpm	    |  float	|      118.0
-valence	      |  float	|      0.84
-danceability	|  float	|      0.79
-acousticness	|  float	|      0.18
+| Field         | Type  | Example         |
+|:--------------|:-----:|----------------:|
+| id            | int   |               1 |
+| title         | str   | "Sunrise City"  |
+| artist        | str   | "Neon Echo"     |
+| genre         | str   | "pop"           |
+| mood          | str   | "happy"         |
+| energy        | float |            0.82 |
+| tempo_bpm     | float |           118.0 |
+| valence       | float |            0.84 |
+| danceability  | float |            0.79 |
+| acousticness  | float |            0.18 |
 
 
 # UserProfile Features
-Field	          |  Type	|  Example
-favorite_genre	|  str	|   "pop"
-favorite_mood	  |  str	|  "happy"
-target_energy	  | float	|    0.8
-likes_acoustic	| bool	|   False
+| Field           | Type  | Example   |
+|:----------------|:-----:|----------:|
+| favorite_genre  | str   | "pop"     |
+| favorite_mood   | str   | "happy"   |
+| target_energy   | float |       0.8 |
+| likes_acoustic  | bool  |     False |
 
 
 # What Gets Compared During Scoring
 Only 4 of the 10 Song fields are used in the match:
 
-UserProfile field	  |  Matched against	  |  How
-favorite_genre	    |     song.genre	    |  Exact match — binary
-favorite_mood	      |     song.mood	      |  Exact match — binary
-target_energy	      |    song.energy	    | Proximity — continuous
-likes_acoustic	    |  song.acousticness  |	Direction — continuous
+| UserProfile field | Matched against    | How                         |
+|:------------------|:------------------:|----------------------------:|
+| favorite_genre    | song.genre         | Exact match — binary        |
+| favorite_mood     | song.mood          | Exact match — binary        |
+| target_energy     | song.energy        | Proximity — continuous      |
+| likes_acoustic    | song.acousticness  | Direction — continuous      |
 
 title, artist, id, tempo_bpm, valence, and danceability are stored on the Song but not used in scoring yet/ They're available for display and future expansion.
 
