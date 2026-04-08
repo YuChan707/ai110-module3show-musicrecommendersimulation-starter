@@ -23,3 +23,73 @@ Low energy (0.0–0.4) → calm, sad, ambient
 Output ONLY the new rows in clean CSV format, without explanations
 
 
+ANS:
+Why the top song always wins
+Every time there is a genre + mood + close energy triple match, the score clusters near 3.97–3.99 out of 4.0. That pattern repeats across every profile because the math guarantees it.
+
+Score breakdown for "Sunrise City" (Pop Happy profile):
+
+Rule	Calculation	Points
+Genre: pop == pop	exact match	+2.00
+Mood: happy == happy	exact match	+1.00
+Energy: `1.0 × (1 -	0.82 - 0.80	)`
+Total		3.98 / 4.0
+The song wins because it is the only song in the catalog that hits all three rules simultaneously. The algorithm is working correctly — but the structure of the weights creates a ceiling problem explained below.
+
+Is genre weighted too heavily?
+Yes — and the data proves it.
+
+The worst-scoring pop song ("Romantic Serenade") still outscores the best non-pop song ("Rooftop Lights"):
+
+
+Romantic Serenade  (pop, wrong mood, far energy)  →  2.65
+Rooftop Lights     (indie pop, right mood, close energy)  →  1.96
+A song with the right genre but wrong mood and mediocre energy beats a song with the right mood, close energy, and a nearly identical genre ("indie pop"). This is the bias: genre alone (2.0 pts) is worth more than mood + near-perfect energy combined (1.0 + ~0.96 = 1.96).
+
+The structural problem:
+
+
+Max score WITH genre match:     2.0 + 1.0 + 1.0 = 4.0
+Max score WITHOUT genre match:        1.0 + 1.0 = 2.0
+A genre match floors your minimum score at 2.0 even if everything else is wrong. A non-genre song can never exceed 2.0 even if everything else is perfect. The genre gate controls 50% of the total possible score.
+
+Is it bias or limited dataset variety?
+Both — but the weights amplify the dataset's thinness.
+
+The catalog has 15 distinct genres across 20 songs, meaning most genres have only 1 song. When your genre matches, that single song wins automatically. There is no competition within the genre to force meaningful differentiation.
+
+Three concrete improvements
+1. Reduce genre's dominance — rebalance the weights
+
+Current max: 4.0 pts. Proposed rebalance:
+
+Feature	Current	Suggested	Reason
+Genre	2.0	1.5	Still highest, but no longer a floor that dominates
+Mood	1.0	1.0	Keep — mood is context-critical
+Energy	1.0	1.0	Keep
+Tempo	—	0.75	Already in your CSV, currently unused
+Valence	—	0.5	Already in your CSV, currently unused
+This brings the max to 4.75 and means a no-genre song with perfect mood + energy + tempo + valence can score 3.25 — genuinely competitive with a genre-only match.
+
+2. Use the features already in the CSV
+
+Your dataset has tempo_bpm, valence, and danceability that score_song currently ignores entirely. Adding them at lower weights immediately increases differentiation without changing the dataset.
+
+3. Expand the catalog
+
+With 1–2 songs per genre, a genre match is essentially a pre-determined winner. Adding 5–10 songs per genre forces the mood and energy rules to actually break ties — which is what they are designed to do.
+
+Quick weight fix you can make right now
+In recommender.py:100-103, change the three constants:
+
+
+# Before
+GENRE_POINTS = 2.0
+MOOD_POINTS  = 1.0
+ENERGY_MAX   = 1.0
+
+# After — genre still leads, but no longer a ceiling
+GENRE_POINTS = 1.5
+MOOD_POINTS  = 1.0
+ENERGY_MAX   = 1.0
+This single change means a song with the right mood + perfect energy (2.0 pts) can now match a genre-only song (1.5 pts), making the lower half of the ranking far more meaningful.

@@ -1,0 +1,36 @@
+recommender.py:97-101 — two constant changes, nothing else touched:
+
+Constant	Before	After	Effect
+GENRE_POINTS	2.0	1.0	genre now worth half as much
+ENERGY_MAX	1.0	2.0	energy now worth twice as much
+MOOD_POINTS	1.0	1.0	unchanged
+Max score	4.0	4.0	same ceiling — math stays valid
+The max score stays 4.0 (1.0 + 1.0 + 2.0), so no negative or out-of-range scores are possible.
+
+How rankings shifted
+Before the experiment:
+
+
+#1  Sunrise City       3.98  (genre + mood + energy)
+#2  Gym Hero           2.87  (genre only + energy)
+#3  Romantic Serenade  2.65  (genre only + low energy)
+#4  Rooftop Lights     1.96  (mood only + energy)
+After the experiment:
+
+
+#1  Sunrise City       3.96  (genre + mood + energy)
+#2  Rooftop Lights     2.92  (mood + energy — no genre match!)
+#3  Gym Hero           2.74  (genre + energy)
+#4  Romantic Serenade  2.30  (genre + low energy)
+The critical shift: "Rooftop Lights" jumped from rank 4 to rank 2, overtaking "Gym Hero". It has no genre match at all, but its mood + close energy (0.76 vs target 0.8) now outweighs a genre match from a song with mediocre energy. This is exactly the bias correction the experiment was designed to test.
+
+Potential side effects to be aware of
+Energy over-prioritization. Energy now accounts for up to 50% of the max score (2.0 / 4.0). Songs with energy close to the target but completely wrong genre and mood can still rank in the top 5 — ranks 5 and 6 above ("Night Drive Loop", "Electronic Pulse") have no genre or mood match at all and still score 1.9.
+
+Genre match is now worth the same as mood match. The original design intentionally made genre the strongest signal. At 1.0 : 1.0, genre and mood are peers — if you want genre to still lead, consider a middle value like 1.5 rather than the full halving to 1.0.
+
+To revert the experiment, change the constants back:
+
+
+GENRE_POINTS = 2.0   # restore
+ENERGY_MAX   = 1.0   # restore

@@ -95,9 +95,10 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 # Scoring weights — adjust these values to tune the algorithm
-GENRE_POINTS = 2.0   # awarded for an exact genre match
+# EXPERIMENT: genre halved (2.0 → 1.0), energy doubled (1.0 → 2.0)
+GENRE_POINTS = 1.0   # awarded for an exact genre match  [was 2.0]
 MOOD_POINTS  = 1.0   # awarded for an exact mood match
-ENERGY_MAX   = 1.0   # maximum points awarded for energy proximity
+ENERGY_MAX   = 2.0   # maximum points awarded for energy proximity  [was 1.0]
 
 
 def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, List[str]]:
