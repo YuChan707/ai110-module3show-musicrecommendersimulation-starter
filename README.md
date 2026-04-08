@@ -15,7 +15,7 @@ Replace this paragraph with your own summary of what your version does.
 
 ---
 
-## How The System Works
+## How The System Works (documented)
 
 The system reads the song catalog, gives each song a score based on how closely its genre, mood, energy, and acoustic character match the user's preferences, then returns the top 5 songs with a reason why they were picked.
 
