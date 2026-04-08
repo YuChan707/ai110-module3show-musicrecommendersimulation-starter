@@ -74,10 +74,7 @@ class Recommender:
         return "Closest available match to your preferences"
 
 def load_songs(csv_path: str) -> List[Dict]:
-    """
-    Loads songs from a CSV file.
-    Required by src/main.py
-    """
+    """Load songs from a CSV file and return a list of song dicts."""
     import csv
     songs = []
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -104,13 +101,7 @@ ENERGY_MAX   = 1.0   # maximum points awarded for energy proximity
 
 
 def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, List[str]]:
-    """
-    Scores a single song against the user's preferences.
-
-    Returns:
-        (total_score, reasons) where reasons is a list of strings
-        explaining each contribution to the score.
-    """
+    """Score a song against user preferences and return the score plus reasons."""
     total   = 0.0
     reasons = []
 
@@ -137,14 +128,7 @@ def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, List[str]]:
 
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Dict]:
-    """
-    Scores every song, ranks by score descending, returns top k.
-
-    Each result is a dict with keys:
-        "song"    — the original song dict
-        "score"   — numeric total score (float)
-        "reasons" — list of strings explaining each score contribution
-    """
+    """Rank songs by score and return the top k recommendations."""
     # Step 1: score every song and pack results into named-key dicts
     scored = [
         {"song": song, "score": score, "reasons": reasons}

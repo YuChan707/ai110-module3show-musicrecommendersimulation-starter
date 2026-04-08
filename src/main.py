@@ -14,6 +14,7 @@ import os
 
 
 def main() -> None:
+    """Run the CLI-first recommendation simulation."""
     # Get the path to data/songs.csv relative to this script
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "songs.csv")
     songs = load_songs(data_path) 
