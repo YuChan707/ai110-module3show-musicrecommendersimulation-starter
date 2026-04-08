@@ -36,11 +36,11 @@ It sets a starter user profile (pop / happy / energy 0.8), calls the recommender
 What Hasn't Been Built Yet
 Every core function is still a placeholder:
 
-Function	Status
-load_songs	Returns empty list — CSV not actually read
-recommend_songs	Returns empty list — no scoring done
+Function	                          |  Status
+load_songs	                        |  Returns empty list — CSV not actually read
+recommend_songs	                    |  Returns empty list — no scoring done
 Recommender.recommend	Just returns the first k songs — no logic
-Recommender.explain_recommendation	Returns "Explanation placeholder"
+Recommender.explain_recommendation	|  Returns "Explanation placeholder"
 
 The skeleton is complete — the data, the data structures, and the wiring between files are all in place — but the actual intelligence (scoring songs, ranking them, explaining why) still needs to be implemented inside the TODO sections of src/recommender.py.
 
@@ -79,6 +79,41 @@ You can include a simple diagram or bullet list if helpful.
 
 ---
 
+## List the specific features
+# Song Features
+Field         |	  Type  |    Example
+id	          |   int	  |       1
+title	        |   str	  |  "Sunrise City"
+artist	      |   str	  |  "Neon Echo"
+genre	        |   str	  |     "pop"
+mood	        |   str	  |     "happy"
+energy	      |  float	|      0.82
+tempo_bpm	    |  float	|      118.0
+valence	      |  float	|      0.84
+danceability	|  float	|      0.79
+acousticness	|  float	|      0.18
+
+
+# UserProfile Features
+Field	          |  Type	|  Example
+favorite_genre	|  str	|   "pop"
+favorite_mood	  |  str	|  "happy"
+target_energy	  | float	|    0.8
+likes_acoustic	| bool	|   False
+
+
+# What Gets Compared During Scoring
+Only 4 of the 10 Song fields are used in the match:
+
+UserProfile field	  |  Matched against	  |  How
+favorite_genre	    |     song.genre	    |  Exact match — binary
+favorite_mood	      |     song.mood	      |  Exact match — binary
+target_energy	      |    song.energy	    | Proximity — continuous
+likes_acoustic	    |  song.acousticness  |	Direction — continuous
+
+title, artist, id, tempo_bpm, valence, and danceability are stored on the Song but not used in scoring yet/ They're available for display and future expansion.
+
+---
 ## Getting Started
 
 ### Setup
