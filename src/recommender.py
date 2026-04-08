@@ -136,10 +136,24 @@ def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, List[str]]:
     return round(total, 2), reasons
 
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, List[str]]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Dict]:
     """
     Scores every song, ranks by score descending, returns top k.
+
+    Each result is a dict with keys:
+        "song"    — the original song dict
+        "score"   — numeric total score (float)
+        "reasons" — list of strings explaining each score contribution
     """
-    scored = [(song, *score_song(song, user_prefs)) for song in songs]
-    ranked = sorted(scored, key=lambda x: x[1], reverse=True)
+    # Step 1: score every song and pack results into named-key dicts
+    scored = [
+        {"song": song, "score": score, "reasons": reasons}
+        for song, (score, reasons) in
+        ((song, score_song(song, user_prefs)) for song in songs)
+    ]
+
+    # Step 2: sort highest score first — sorted() leaves the original list intact
+    ranked = sorted(scored, key=lambda result: result["score"], reverse=True)
+
+    # Step 3: return the top k results
     return ranked[:k]

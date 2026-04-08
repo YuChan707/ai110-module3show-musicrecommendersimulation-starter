@@ -1,0 +1,28 @@
+Step 1: Score and pack (recommender.py:149-153)
+
+A generator expression feeds each song into score_song, which returns (score, reasons). The list comprehension immediately unpacks that tuple and wraps everything into a named dict. One pass, no intermediate list.
+
+
+song → score_song() → (3.98, ["genre match (+2.0)", ...])
+                   ↓
+{"song": song, "score": 3.98, "reasons": [...]}
+Step 2: Sort (recommender.py:156)
+
+sorted() produces a new sorted list. The key= function tells it to compare by result["score"], and reverse=True puts the highest score first.
+
+Step 3: Slice (recommender.py:159)
+
+ranked[:k] returns only the top k entries. If k=5 and there are 20 songs, 15 are simply discarded.
+
+.sort() vs sorted() — which to use here
+
+.sort()	sorted()
+Operates on	the list in-place	returns a new list
+Original list	destroyed	preserved
+Works on	lists only	any iterable
+Return value	None	the sorted list
+For this use case sorted() is the right choice for two reasons:
+
+scored is built fresh each call — there is no reason to mutate it, and returning None from .sort() would mean writing two lines instead of one.
+sorted() works on any iterable, including the generator expression on line 152 — .sort() cannot.
+Rule of thumb: use sorted() when you need the result as a value (to assign, slice, or return). Use .sort() only when you intentionally want to sort a long list in place to avoid the memory cost of a copy.

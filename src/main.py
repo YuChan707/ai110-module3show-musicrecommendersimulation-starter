@@ -24,7 +24,10 @@ def main() -> None:
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
     print("\nTop recommendations:\n")
-    for song, score, reasons in recommendations:
+    for result in recommendations:
+        song    = result["song"]
+        score   = result["score"]
+        reasons = result["reasons"]
         print(f"{song['title']} by {song['artist']} - Score: {score:.2f}")
         print(f"Why: {', '.join(reasons)}")
         print()
