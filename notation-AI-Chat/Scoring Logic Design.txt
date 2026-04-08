@@ -1,0 +1,122 @@
+#Scoring Logic Design
+
+Dataset Snapshot
+Feature	Type	Range / Examples
+genre	categorical	pop, lofi, rock, ambient, jazz, synthwave, indie pop, classical, electronic, hip-hop, country, reggae, blues, metal, folk
+mood	categorical	happy, chill, intense, relaxed, focused, moody, peaceful, experimental, aggressive, nostalgic, melancholic, dreamy, romantic
+energy	numerical	0.20 – 0.98
+tempo_bpm	numerical	60 – 160
+valence	numerical	0.25 – 0.84
+danceability	numerical	0.32 – 0.91
+acousticness	numerical	0.03 – 0.98
+1. Point Weighting Strategy
+Why some features outweigh others:
+
+Priority	Feature	Max Points	Reasoning
+1	genre	3.0	Strongest hard preference — a metal fan rarely wants classical, no gradient
+2	mood	2.0	Context-driven (gym = intense, study = focused). High importance but can flex
+3	energy	1.5	Best numerical proxy for mood intensity; tightly correlated with user context
+4	valence	1.0	Captures emotional positivity — critical for happy vs. melancholic requests
+5	tempo_bpm	0.75	Matters for specific use-cases (running, dancing) but less universal
+6	danceability	0.5	Useful but partially redundant with energy + tempo
+7	acousticness	0.25	Texture preference (acoustic vs. electronic) — subtle tie-breaker
+Maximum possible score = 9.0 points
+
+2. Critique of Your Starting Rules
+Your proposal: +2.0 genre, +1.0 mood, + energy_bonus
+
+Issue	Problem	Fix
+Genre weight too low relative to mood	A 2:1 ratio undersells how hard genre preference is	Use 3:2 ratio
+"Additional energy points" is vague	No clear formula = inconsistent implementation	Use (1 - abs_diff) × weight
+Missing 4 features in the dataset	valence, danceability, acousticness, tempo_bpm are unused	Include all 5 numericals
+No BPM normalization	BPM range is 60–160 (100-point span) — raw difference is misleading	Divide by BPM_RANGE = 100
+3. Numerical Similarity Formula
+For any bounded feature in [0, 1]:
+
+
+similarity = 1 - |user_value - song_value|
+Perfect match (diff = 0) → similarity = 1.0 → full points
+Worst case (diff = 1.0) → similarity = 0.0 → zero points
+Smooth gradient, no cliff edges
+For tempo_bpm (range 60–160, span = 100):
+
+
+similarity = 1 - |user_bpm - song_bpm| / BPM_RANGE   where BPM_RANGE = 100
+4. Final Scoring Formula
+
+score(song, user) =
+    (genre == user.genre ? 3.0 : 0.0)
+  + (mood  == user.mood  ? 2.0 : 0.0)
+  + (1 - |energy      - user.energy|)           × 1.50
+  + (1 - |valence     - user.valence|)           × 1.00
+  + (1 - |tempo_bpm   - user.tempo_bpm| / 100)   × 0.75
+  + (1 - |danceability- user.danceability|)      × 0.50
+  + (1 - |acousticness- user.acousticness|)      × 0.25
+Max score = 3.0 + 2.0 + 1.5 + 1.0 + 0.75 + 0.5 + 0.25 = 9.0
+
+5. Algorithm Recipe (Step-by-Step)
+
+ALGORITHM: content_based_score(song, user_profile)
+
+INPUT:
+  song          — one row from songs.csv
+  user_profile  — dict with keys matching song features + target values
+
+STEPS:
+  1. score = 0.0
+
+  2. # Categorical matches (binary)
+     if song.genre == user_profile.genre:
+         score += 3.0
+     if song.mood == user_profile.mood:
+         score += 2.0
+
+  3. # Energy similarity (0–1 range)
+     score += (1 - abs(song.energy - user_profile.energy)) * 1.50
+
+  4. # Valence similarity (0–1 range)
+     score += (1 - abs(song.valence - user_profile.valence)) * 1.00
+
+  5. # Tempo similarity (normalize over 100 BPM range)
+     bpm_diff = abs(song.tempo_bpm - user_profile.tempo_bpm)
+     score += (1 - min(bpm_diff / 100, 1.0)) * 0.75
+
+  6. # Danceability similarity (0–1 range)
+     score += (1 - abs(song.danceability - user_profile.danceability)) * 0.50
+
+  7. # Acousticness similarity (0–1 range)
+     score += (1 - abs(song.acousticness - user_profile.acousticness)) * 0.25
+
+  8. return score   # range: 0.0 – 9.0
+6. Worked Example
+User profile: genre=lofi, mood=chill, energy=0.40, tempo=80, valence=0.58, danceability=0.60, acousticness=0.75
+
+Scoring Song #2 — "Midnight Coding" (lofi, chill, energy=0.42, bpm=78, valence=0.56, dance=0.62, acoustic=0.71):
+
+Step	Calculation	Points
+Genre: lofi == lofi	match	+3.00
+Mood: chill == chill	match	+2.00
+Energy: (1 - |0.40-0.42|) × 1.5	0.98 × 1.5	+1.47
+Valence: (1 - |0.58-0.56|) × 1.0	0.98 × 1.0	+0.98
+Tempo: (1 - |80-78|/100) × 0.75	0.98 × 0.75	+0.735
+Danceability: (1 - |0.60-0.62|) × 0.5	0.98 × 0.5	+0.49
+Acousticness: (1 - |0.75-0.71|) × 0.25	0.96 × 0.25	+0.24
+Total		8.92 / 9.0
+Scoring Song #3 — "Storm Runner" (rock, intense, energy=0.91, bpm=152):
+
+Step	Calculation	Points
+Genre: lofi ≠ rock	no match	+0.00
+Mood: chill ≠ intense	no match	+0.00
+Energy: (1 - |0.40-0.91|) × 1.5	0.49 × 1.5	+0.74
+Valence: (1 - |0.58-0.48|) × 1.0	0.90 × 1.0	+0.90
+Tempo: (1 - |80-152|/100) × 0.75	0.28 × 0.75	+0.21
+Danceability: (1 - |0.60-0.66|) × 0.5	0.94 × 0.5	+0.47
+Acousticness: (1 - |0.75-0.10|) × 0.25	0.35 × 0.25	+0.09
+Total		2.41 / 9.0
+"Midnight Coding" scores 8.92 vs. "Storm Runner" 2.41 — the algorithm correctly surfaces the better match by a wide margin.
+
+Key Design Decisions Summary
+Genre and mood use hard binary scores because taste in these dimensions isn't a gradient — knowing the user prefers lofi is a strong signal, not a soft preference
+All numerical features use 1 - abs_diff to give a smooth score without arbitrary thresholds or cliff edges
+BPM is normalized by the dataset's natural range (100) so a 10-BPM difference has the same relative weight as a 0.10 energy difference
+min(..., 1.0) guard on BPM prevents negative scores if a user's target BPM is outside the dataset range
