@@ -15,59 +15,45 @@ Replace this paragraph with your own summary of what your version does.
 
 ---
 
-## How The System Works (documented)
+## How The System Works 
 
 The system reads the song catalog, gives each song a score based on how closely its genre, mood, energy, and acoustic character match the user's preferences, then returns the top 5 songs with a reason why they were picked.
 
 What Exists Right Now
-The data is ready — data/songs.csv
+The data is ready in `data/songs.csv`
 10 songs, each with: title, artist, genre, mood, energy, tempo, valence, danceability, acousticness. This is the catalog the recommender will search through.
 
-The structure is defined — src/recommender.py
+The structure is defined in `src/recommender.py`
 Two blueprints have been created:
 
-Song — a template that holds all a song's attributes
+Song, a template that holds all a song's attributes
 UserProfile — a template that holds the user's preferences (favorite genre, mood, target energy, likes acoustic or not)
 A Recommender class also exists, along with two functions: load_songs and recommend_songs.
 
-The runner is ready — src/main.py
+The runner is ready in `src/main.py`
 It sets a starter user profile (pop / happy / energy 0.8), calls the recommender, and prints the top 5 results with explanations.
 
 
-The skeleton is complete — the data, the data structures, and the wiring between files are all in place — but the actual intelligence (scoring songs, ranking them, explaining why) still needs to be implemented inside the TODO sections of src/recommender.py.
+The skeleton is complete, the data, the data structures, and the wiring between files are all in place — but the actual intelligence (scoring songs, ranking them, explaining why) still needs to be implemented inside the TODO sections of src/recommender.py.
 
 Following this steps:
 1) You have two things going in:
 
-A song catalog (data/songs.csv) — 10 songs, each described by numbers like energy (0–1), tempo (BPM), acousticness (0–1), and labels like genre and mood.
+A song catalog (`data/songs.csv`) — 10 songs, each described by numbers like energy (0–1), tempo (BPM), acousticness (0–1), and labels like genre and mood.
 A user profile — what the user likes: { genre: "pop", mood: "happy", energy: 0.8 }.
 
 2) For every song in the catalog, the system asks: "How well does this song match the user?"
 
 It checks four things and combines them:
 
-Signal	How it's measured	Weight
-Genre match	Does the genre match exactly? 1.0 or 0.0	30%
-Mood match	Does the mood match exactly? 1.0 or 0.0	25%
-Energy proximity	How close is the energy to what the user wants?	25%
-Acoustic preference	Does it match the user's acoustic/electronic taste?	20%
-The result is one number between 0.0 and 1.0 per song.
+**Signal	How it's measured	Weight**
+* Genre match	Does the genre match exactly? 1.0 or 0.0	30%
+* Mood match	Does the mood match exactly? 1.0 or 0.0	25%
+* Energy proximity	How close is the energy to what the user wants?	25%
+* Acoustic preference	Does it match the user's acoustic/electronic taste?	20%
+* The result is one number between 0.0 and 1.0 per song.
 
 3) Once every song has a score, the system sorts them from highest to lowest and returns the top 5. That's the recommendation list.
-
-4) For each top song, the system checks why it scored well and writes a plain-English sentence:
-
-"Recommended because it matches your favorite genre (pop) and energy level is close to your target."
-
-Some prompts to answer:
-
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
-
-You can include a simple diagram or bullet list if helpful.
 
 ---
 
