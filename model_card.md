@@ -169,28 +169,27 @@ A few sentences about your experience.
 Prompts:  
 
 - What you learned about recommender systems  
-
+It's really good to brainstorm. Own my own, I polish the idea with own thought + repeat same process to brainstorm to polish the idea.
 
 - Something unexpected or interesting you discovered  
-
+Copilot/Claude lost the track. Need set up at the begin the rulers/requirements/needs. Or keep reminding the keywords reminders each instruction/chat send.
 
 - How this changed the way you think about music recommendation apps  
-
-
+AI to create algorithm, provide diverse algorithm methods
 
 
 
 Last feedbacks
 * What was your biggest learning moment during this project?
-
+The matter of choose the right word (give better result)
 
 * How did using AI tools help you, and when did you need to double-check them?
-
+I ask AI to point where and why give that output/idea/code generated. I allow the change and then I read on my own the context of the code. if I don't like it, I just undone (Ctrl + z).
 
 * What surprised you about how simple algorithms can still "feel" like recommendations?
-
+The math is four rules (involve the genre and mood that maybe are not relate but the energy is the key) & abvious output (Sunrise City Song)
 
 
 * What would you try next if you extended this project?
-
+Create a wedsite that show the result of my model and treding music. Using python streamlit
 
